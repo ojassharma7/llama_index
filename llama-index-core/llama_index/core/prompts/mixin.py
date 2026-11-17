@@ -68,7 +68,11 @@ class PromptMixin(ABC):
         sub_prompt_dicts: Dict[str, PromptDictType] = defaultdict(dict)
         for key in prompts_dict:
             if ":" in key:
-                module_name, sub_key = key.split(":")
+                # Split once only. `get_prompts` prefixes a sub-module's keys with
+                # its own module name as it recurses, so a key reaching a module
+                # two levels down is "module:sub_module:prompt_key". The remainder
+                # is handed to the sub-module, which splits the next name off it.
+                module_name, sub_key = key.split(":", 1)
                 sub_prompt_dicts[module_name][sub_key] = prompts_dict[key]
 
         # now update prompts for submodules
